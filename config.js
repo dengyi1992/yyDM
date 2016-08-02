@@ -21,20 +21,20 @@ var config = {
 
 
     topn:300,
-    db: {
+    /*db: {
         host: 'localhost',
         user: 'root',
         password: 'root',
         database: 'douyu',
         port: 3306
+    }*/
+    db:{
+        host: 'localhost',
+        user: 'root',
+        password: 'xidian@513',
+        database: 'douyu',
+        port: 3306
     }
-    // db:{
-    //     host: 'localhost',
-    //     user: 'root',
-    //     password: 'xidian@513',
-    //     database: 'douyu',
-    //     port: 3306
-    // }
 };
 
 

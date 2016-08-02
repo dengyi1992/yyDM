@@ -108,7 +108,7 @@ exports.monitorRoom = function(roomid) {
                         }
                         msg.ctime = new Date().getTime();
                         values.push(msg);
-                        if(values.length > 20){
+                        if(values.length > 100){
                             upload.uploadServe(roomid, "yy", values);
                             values = [];
                         }
