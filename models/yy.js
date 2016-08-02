@@ -3,7 +3,7 @@
  */
 var net = require('net');
 var upload = require("./upload");
-/*var loginInfo = {"uri": "0", "type": "0", "svc_link": "66b2c67d-f7ab-4355-a6f0-b52ffccc857e"};
+/*var loginInfo = {"uri": "0", "type": "0", "svc_link": "66b2c67d-f7ab-4355-a6f0-b52ffccc857e"};..
 var sureinfo = {
     "uri": "1",
     "top_sid": "54880976",
