@@ -35,12 +35,13 @@ exports.monitorRoom = function(roomid) {
     });
 
     client.on('connect', function (connection) {
-
+        map.set(roomid,true);
         console.log('WebSocket Client Connected');
         connection.on('error', function (error) {
             console.log("Connection Error: " + error.toString());
         });
         connection.on('close', function () {
+            map.set(roomid,false);
             console.log('echo-protocol Connection Closed');
         });
         var values = [];

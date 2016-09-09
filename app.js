@@ -11,7 +11,9 @@ var EventEmitter = require('events').EventEmitter;
 var myEvents = new EventEmitter();
 var schedule = require('node-schedule');
 var rule = new schedule.RecurrenceRule();
-
+var rule1 = new schedule.RecurrenceRule();
+var HashMap = require("hashmap").HashMap;
+map=new HashMap();
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -65,33 +67,43 @@ app.use(function (err, req, res, next) {
 
 var rooms = [];
 var times = [];
-request('http://120.27.94.166:2999/getRooms?platform=yy&topn=' + config.topn, function (error, response, body) {
-    if (error) {
-        return console.log(error)
-    }
-    var parse = JSON.parse(body);
-    for (var i = 0; i < parse.data.length; i++) {
-        rooms.push(parseInt(parse.data[i].room_id));
-    }
-
-    rule.second = times;
-    for (var i = 0; i < 60; i++) {
-        times.push(i);
-    }
-    myEvents.on('danmu', function (room_id) {
-        yy.monitorRoom(room_id);
-        // sendroomid.getChatInfo(room_id);
-    });
-    var count = 0;
-    schedule.scheduleJob(rule, function () {
-        if (count>=rooms.length){
-            this.cancel();
-            return;
+var time = [];
+for (var i = 0; i < 60; i += 15) {
+    time.push(i);
+}
+rule1.minute = time;
+schedule.scheduleJob(rule1, function () {
+    request('http://120.27.94.166:2999/getRooms?platform=yy&topn=' + config.topn, function (error, response, body) {
+        if (error) {
+            return console.log(error)
         }
-        myEvents.emit("danmu", rooms[count++]);
-    });
+        var parse = JSON.parse(body);
+        for (var i = 0; i < parse.data.length; i++) {
+            rooms.push(parseInt(parse.data[i].room_id));
+        }
 
+        rule.second = times;
+        for (var i = 0; i < 60; i++) {
+            times.push(i);
+        }
+        myEvents.on('danmu', function (room_id) {
+            yy.monitorRoom(room_id);
+            // sendroomid.getChatInfo(room_id);
+        });
+        var count = 0;
+        schedule.scheduleJob(rule, function () {
+            if (count >= rooms.length) {
+                this.cancel();
+                return;
+            }
+            if(map.get(rooms[count])==undefined||!map.get(rooms[count])){
+                myEvents.emit("danmu", rooms[count++]);
+            }
+        });
+
+    });
 });
+
 
 /*var rooms = ["54880976", "78692132", "98728087"];
  myEvents.on('danmu',function (room_id) {
