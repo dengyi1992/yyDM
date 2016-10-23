@@ -13,7 +13,7 @@ var schedule = require('node-schedule');
 var rule = new schedule.RecurrenceRule();
 var rule1 = new schedule.RecurrenceRule();
 var HashMap = require("hashmap").HashMap;
-map=new HashMap();
+map = new HashMap();
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -72,50 +72,57 @@ for (var i = 0; i < 60; i += 15) {
     time.push(i);
 }
 rule1.minute = time;
-schedule.scheduleJob(rule1, function () {
-    request('http://120.27.94.166:2999/getRooms?platform=yy&topn=' + config.topn, function (error, response, body) {
-        if (error) {
-            return console.log(error)
-        }
-        var parse = JSON.parse(body);
-        for (var i = 0; i < parse.data.length; i++) {
-            rooms.push(parseInt(parse.data[i].room_id));
-        }
-
-        rule.second = times;
-        for (var i = 0; i < 60; i++) {
-            times.push(i);
-        }
-        myEvents.on('danmu', function (room_id) {
-            yy.monitorRoom(room_id);
-            // sendroomid.getChatInfo(room_id);
-        });
+myEvents.on('danmu', function (room_id) {
+    yy.monitorRoom(room_id);
+    // sendroomid.getChatInfo(room_id);
+});
+for (var i = 0; i < 60; i++) {
+    times.push(i);
+}
+rule.second = times;
+// schedule.scheduleJob(rule1, function () {
+//     request('http://120.27.94.166:2999/getRooms?platform=yy&topn=' + config.topn, function (error, response, body) {
+//         if (error) {
+//             return console.log(error)
+//         }
+//         var parse = JSON.parse(body);
+//         for (var i = 0; i < parse.data.length; i++) {
+//             rooms.push(parseInt(parse.data[i].room_id));
+//         }
+//
+//
+//         var count = 0;
+//         schedule.scheduleJob(rule, function () {
+//             if (count >= rooms.length) {
+//                 this.cancel();
+//                 return;
+//             }
+//             if (map.get(rooms[count]) == undefined || !map.get(rooms[count])) {
+//                 myEvents.emit("danmu", rooms[count++]);
+//             }
+//         });
+//
+//     });
+// });
+function DMstart(){
+    request("http://idx.3g.yy.com/mobyy/module/recommend/index/idx/8?page=1&ispType=4&bkt=0", function (error, response, body) {
+        if (error) return console.log(error);
+        var room_list = JSON.parse(body).data.data;
         var count = 0;
         schedule.scheduleJob(rule, function () {
-            if (count >= rooms.length) {
+            if (count >= room_list.length) {
                 this.cancel();
                 return;
             }
-            if(map.get(rooms[count])==undefined||!map.get(rooms[count])){
-                myEvents.emit("danmu", rooms[count++]);
+            if (map.get(room_list[count].sid) == undefined || !map.get(room_list[count].sid)) {
+                myEvents.emit("danmu", room_list[count++].sid);
             }
         });
-
     });
+
+}
+schedule.scheduleJob(rule1, function () {
+    DMstart();
 });
-
-
-/*var rooms = ["54880976", "78692132", "98728087"];
- myEvents.on('danmu',function (room_id) {
- // console.log("超神很屌！！！");
- yy.monitorRoom(room_id);
- // sendroomid.getChatInfo(room_id);
-
- });
-
- rooms.forEach(function (room) {
- myEvents.emit("danmu", room);
- });*/
-
-
+DMstart();
 module.exports = app;
