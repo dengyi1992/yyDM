@@ -107,17 +107,22 @@ rule.second = times;
 function DMstart(){
     request("http://idx.3g.yy.com/mobyy/module/recommend/index/idx/8?page=1&ispType=4&bkt=0", function (error, response, body) {
         if (error) return console.log(error);
-        var room_list = JSON.parse(body).data.data;
-        var count = 0;
-        schedule.scheduleJob(rule, function () {
-            if (count >= room_list.length) {
-                this.cancel();
-                return;
-            }
-            if (map.get(room_list[count].sid) == undefined || !map.get(room_list[count].sid)) {
-                myEvents.emit("danmu", room_list[count++].sid);
-            }
-        });
+        try{
+            var room_list = JSON.parse(body).data.data;
+            var count = 0;
+            schedule.scheduleJob(rule, function () {
+                if (count >= room_list.length) {
+                    this.cancel();
+                    return;
+                }
+                if (map.get(room_list[count].sid) == undefined || !map.get(room_list[count].sid)) {
+                    myEvents.emit("danmu", room_list[count++].sid);
+                }
+            });
+        }catch (e){
+            console.log(e);
+        }
+
     });
 
 }
